@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://js.paystack.co https://checkout.paystack.com https://checkout.gointerpay.net/ https://checkout.rch.io https://www.googletagmanager.com https://s3-eu-west-1.amazonaws.com/pstk-public-files/js/ https://applepay.cdn-apple.com 'unsafe-inline'; frame-src 'self' https://checkout.paystack.com; connect-src 'self' https://api.paystack.co https://checkout.paystack.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;

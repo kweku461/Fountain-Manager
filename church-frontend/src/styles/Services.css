@@ -1,0 +1,131 @@
+/* PAGE */
+.services-page {
+  min-height: 100vh;
+  background: #f2f7fd;
+  padding-bottom: 100px;
+}
+
+/* HEADER CARD */
+.services-header-card {
+  background: #ffffff;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+
+  box-shadow:
+    0px 6px 10px rgba(0, 0, 0, 0.08),
+    0px 14px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* HEADER ROW */
+.services-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.services-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ICON CIRCLE */
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* SEARCH */
+.search-box {
+  height: 54px;
+  padding: 0 18px;
+  border-radius: 30px;
+  background: #f5f7fb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 14px;
+}
+
+/* CONTENT */
+.services-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* DATE LABEL */
+.date-label {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #000;
+  margin: 10px 0;
+}
+
+/* SERVICE CARD */
+.service-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px;
+
+  box-shadow:
+    0px 6px 10px rgba(0, 0, 0, 0.08),
+    0px 14px 25px rgba(0, 0, 0, 0.12);
+}
+
+.service-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.service-card p {
+  font-size: 13px;
+  color: #7a7a7a;
+  margin-top: 6px;
+}
+
+/* FLOATING BUTTON */
+.fab {
+  position: fixed;
+  right: 20px;
+  bottom: 90px;
+
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: white;
+
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0px 10px 20px rgba(79, 70, 229, 0.4);
+  cursor: pointer;
+}

@@ -1,0 +1,173 @@
+/* Full screen background */
+.login-page {
+  min-height: 100vh;   /* use vh instead of svh for cross-browser */
+  width: 100%;
+  background: #F1F7FE;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  box-sizing: border-box;  /* ensures padding doesn’t push content */
+}
+
+/* Centered card */
+.login-card {
+  width: 100%;
+  max-width: 360px; 
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Logo */
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+
+.logo-wrapper img {
+  width: 120px;
+  height: auto;
+}
+
+/* Subtitle */
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #9CA3AF;
+  line-height: 1.6;
+}
+
+/* Fields */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+}
+
+.field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  margin-bottom: 6px;
+}
+
+/* Input wrapper */
+/* slightly bolder than subtitle */
+.bold-label {
+  font-weight: 500;
+  color: #111;
+}
+
+/* input wrapper already exists — just ensure this stays */
+.input-wrapper {
+  width: 100%;
+  height: 58px;
+  padding: 0 20px;
+  border-radius: 30px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  box-sizing: border-box; /* 🔒 CRITICAL */
+
+  filter:
+    drop-shadow(0px 6px 10px rgba(0, 0, 0, 0.08))
+    drop-shadow(0px 14px 25px rgba(0, 0, 0, 0.12));
+}
+
+.input-wrapper input {
+  flex: 1;
+  min-width: 0;          /* 🔒 prevents overflow */
+  border: none;
+  outline: none;
+  background: transparent;
+  border-radius: 30px;
+  font-size: 15px;
+  color: #111827;
+}
+
+.input-wrapper input::placeholder {
+  color: #9CA3AF;
+}
+
+.toggle-password {
+  cursor: pointer;
+  color: #6B7280;
+}
+
+/* Forgot password */
+.forgot {
+  text-align: right;
+}
+
+.forgot a {
+  font-size: 13px;
+  color: #4F46E5;
+  text-decoration: none;
+}
+
+/* Button */
+.login-btn {
+  height: 56px;
+  border-radius: 28px;
+
+  background: #4F46E5;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+
+  border: none;
+  cursor: pointer;
+
+  box-shadow: 0 12px 25px rgba(79, 70, 229, 0.35);
+}
+
+/* Footer */
+.footer {
+  margin-top: 10px;
+  padding-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #6B7280;
+}
+
+
+.footer a {
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+.auth-input {
+  width: 100%;
+  height: 60px;
+  padding: 0 16px 0 48px;
+  border-radius: 30px;
+  border: none;
+  background: #ffffff;
+
+  /* ✅ ALWAYS VISIBLE DROP SHADOW */
+  filter:
+    drop-shadow(0px 6px 10px rgba(0, 0, 0, 0.06))
+    drop-shadow(0px 14px 24px rgba(0, 0, 0, 0.10));
+
+  font-size: 15px;
+  color: #111827;
+}
+
+.auth-input::placeholder {
+  color: #9CA3AF;
+}
+
+/* ❌ DO NOT change shadow on focus */
+.auth-input:focus {
+  outline: none;
+}
+
+
+
