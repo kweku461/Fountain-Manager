@@ -1,6 +1,6 @@
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/Logo.png";
 import "../styles/Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { apiCall } from "../utils/api";

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/Logo.png";
 import SideDrawer from "../components/SideDrawer";
 
 export default function Dashboard() {

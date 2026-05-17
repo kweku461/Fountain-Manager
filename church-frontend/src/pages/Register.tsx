@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import "../styles/Register.css";
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 import { apiCall } from "../utils/api";
 
 export default function Register() {

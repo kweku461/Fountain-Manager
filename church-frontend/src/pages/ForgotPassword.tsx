@@ -1,7 +1,7 @@
 import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/Logo.png";
 import "../styles/ForgotPassword.css";
 import { apiCall } from "../utils/api";
 
