@@ -14,7 +14,6 @@ import com.church.church_backend.security.JwtAuthenticationFilter;
 import com.church.church_backend.security.RateLimitFilter;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -31,10 +30,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
+            // Local development
             "http://localhost:5173",
             "http://localhost:5174",
             "http://localhost:5175",
-            "http://localhost:8080"
+            "http://localhost:8080",
+            // Production frontend on Render
+            "https://fountain-manager-church-frontend.onrender.com"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
@@ -82,12 +84,12 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.PUT, "/attendance/**").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/attendance/service/**").authenticated()
 
-                    // 🔹 Profile (authenticated)
+                    // Profile
                     .requestMatchers(HttpMethod.GET, "/api/profile").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/profile").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/profile/change-password").authenticated()
 
-                    // 🔹 Church info (authenticated)
+                    // Church info
                     .requestMatchers(HttpMethod.GET, "/api/church").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/church").authenticated()
 
