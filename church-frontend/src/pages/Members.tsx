@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/Members.css";
 import { apiCall, logout } from "../utils/api";
+import { API_URL } from "../App";
 
 interface Member {
   id: number;
@@ -90,15 +91,12 @@ export default function Members() {
   const handleDeleteMember = async () => {
     if (!deleteConfirmId) return;
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/members/${deleteConfirmId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await fetch(`${API_URL}/api/members/${deleteConfirmId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setMembers((prev) => prev.filter((m) => m.id !== deleteConfirmId));
       setDeleteConfirmId(null);
       showToast("Member deleted successfully", "success");
@@ -177,13 +175,7 @@ export default function Members() {
         ) : (
           filteredMembers.map((member) => (
             <div key={member.id} className="member-card">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "start",
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
                 {/* MEMBER INFO */}
                 <div style={{ flex: 1 }}>
                   <h4 style={{ marginBottom: "8px" }}>
@@ -204,45 +196,25 @@ export default function Members() {
                 </div>
 
                 {/* THREE DOTS MENU */}
-                <div
-                  className="member-menu-wrap"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div className="member-menu-wrap" onClick={(e) => e.stopPropagation()}>
                   <button
                     className="member-menu-btn"
-                    onClick={() =>
-                      setOpenMenuId(openMenuId === member.id ? null : member.id)
-                    }
+                    onClick={() => setOpenMenuId(openMenuId === member.id ? null : member.id)}
                   >
                     <MoreHorizontal size={18} />
                   </button>
 
                   {openMenuId === member.id && (
                     <div className="member-dropdown">
-                      <button
-                        onClick={() => {
-                          setSelectedMember(member);
-                          setOpenMenuId(null);
-                        }}
-                      >
+                      <button onClick={() => { setSelectedMember(member); setOpenMenuId(null); }}>
                         View details
                       </button>
-                      <button
-                        onClick={() => {
-                          navigate("/members/create", { state: { member } });
-                          setOpenMenuId(null);
-                        }}
-                      >
+                      <button onClick={() => { navigate("/members/create", { state: { member } }); setOpenMenuId(null); }}>
                         Edit
                       </button>
                       <button
                         className="danger"
-                        onClick={() =>
-                          confirmDelete(
-                            member.id,
-                            `${member.firstName} ${member.lastName}`
-                          )
-                        }
+                        onClick={() => confirmDelete(member.id, `${member.firstName} ${member.lastName}`)}
                       >
                         Delete
                       </button>
@@ -263,20 +235,16 @@ export default function Members() {
       {/* BOTTOM NAV */}
       <div className="bottom-nav">
         <div className="nav-item" onClick={() => navigate("/dashboard")}>
-          <Home size={22} />
-          <span>Home</span>
+          <Home size={22} /><span>Home</span>
         </div>
         <div className="nav-item active">
-          <User size={22} />
-          <span>Members</span>
+          <User size={22} /><span>Members</span>
         </div>
         <div className="nav-item">
-          <Calendar size={22} />
-          <span>Calendar</span>
+          <Calendar size={22} /><span>Calendar</span>
         </div>
         <div className="nav-item">
-          <Settings size={22} />
-          <span>Settings</span>
+          <Settings size={22} /><span>Settings</span>
         </div>
       </div>
 
@@ -286,10 +254,7 @@ export default function Members() {
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{selectedMember.firstName} {selectedMember.lastName}</h3>
-              <button
-                className="modal-close"
-                onClick={() => setSelectedMember(null)}
-              >
+              <button className="modal-close" onClick={() => setSelectedMember(null)}>
                 <X size={20} />
               </button>
             </div>
@@ -317,10 +282,7 @@ export default function Members() {
 
             <button
               className="modal-edit-btn"
-              onClick={() => {
-                navigate("/members/create", { state: { member: selectedMember } });
-                setSelectedMember(null);
-              }}
+              onClick={() => { navigate("/members/create", { state: { member: selectedMember } }); setSelectedMember(null); }}
             >
               Edit Member
             </button>
@@ -334,79 +296,27 @@ export default function Members() {
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Edit Member</h3>
-              <button
-                className="modal-close"
-                onClick={() => setEditMember(null)}
-              >
+              <button className="modal-close" onClick={() => setEditMember(null)}>
                 <X size={20} />
               </button>
             </div>
 
             <div className="edit-form">
-              <div className="edit-field">
-                <label>First name</label>
-                <input
-                  type="text"
-                  value={editMember.firstName}
-                  onChange={(e) =>
-                    setEditMember((prev) => ({ ...prev!, firstName: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="edit-field">
-                <label>Last name</label>
-                <input
-                  type="text"
-                  value={editMember.lastName}
-                  onChange={(e) =>
-                    setEditMember((prev) => ({ ...prev!, lastName: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="edit-field">
-                <label>Phone</label>
-                <input
-                  type="tel"
-                  value={editMember.phone}
-                  onChange={(e) =>
-                    setEditMember((prev) => ({ ...prev!, phone: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="edit-field">
-                <label>Address</label>
-                <input
-                  type="text"
-                  value={editMember.address}
-                  onChange={(e) =>
-                    setEditMember((prev) => ({ ...prev!, address: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="edit-field">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={editMember.email}
-                  onChange={(e) =>
-                    setEditMember((prev) => ({ ...prev!, email: e.target.value }))
-                  }
-                />
-              </div>
+              {["firstName", "lastName", "phone", "address", "email"].map((field) => (
+                <div className="edit-field" key={field}>
+                  <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                  <input
+                    type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
+                    value={(editMember as any)[field]}
+                    onChange={(e) => setEditMember((prev) => ({ ...prev!, [field]: e.target.value }))}
+                  />
+                </div>
+              ))}
             </div>
 
             <div className="modal-footer">
-              <button
-                className="modal-cancel-btn"
-                onClick={() => setEditMember(null)}
-              >
-                Cancel
-              </button>
-              <button
-                className="modal-save-btn"
-                onClick={handleEditSave}
-                disabled={editLoading}
-              >
+              <button className="modal-cancel-btn" onClick={() => setEditMember(null)}>Cancel</button>
+              <button className="modal-save-btn" onClick={handleEditSave} disabled={editLoading}>
                 {editLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -414,38 +324,23 @@ export default function Members() {
         </div>
       )}
 
-      {/* DELETE CONFIRMATION MODAL */}
-{deleteConfirmId && (
-  <div className="modal-overlay" onClick={() => setDeleteConfirmId(null)}>
-    <div className="confirm-popup" onClick={(e) => e.stopPropagation()}>
-      <p className="confirm-message">
-        Are you sure you want to delete{" "}
-        <strong>{deleteConfirmName}</strong>? This action cannot be undone.
-      </p>
-      <div className="confirm-actions">
-        <button
-          className="confirm-cancel-btn"
-          onClick={() => setDeleteConfirmId(null)}
-        >
-          Cancel
-        </button>
-        <button
-          className="confirm-delete-btn"
-          onClick={handleDeleteMember}
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-      {/* TOAST */}
-      {toast && (
-        <div className={`toast ${toast.type}`}>
-          {toast.message}
+      {/* DELETE CONFIRMATION */}
+      {deleteConfirmId && (
+        <div className="modal-overlay" onClick={() => setDeleteConfirmId(null)}>
+          <div className="confirm-popup" onClick={(e) => e.stopPropagation()}>
+            <p className="confirm-message">
+              Are you sure you want to delete <strong>{deleteConfirmName}</strong>? This action cannot be undone.
+            </p>
+            <div className="confirm-actions">
+              <button className="confirm-cancel-btn" onClick={() => setDeleteConfirmId(null)}>Cancel</button>
+              <button className="confirm-delete-btn" onClick={handleDeleteMember}>Delete</button>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* TOAST */}
+      {toast && <div className={`toast ${toast.type}`}>{toast.message}</div>}
     </div>
   );
 }

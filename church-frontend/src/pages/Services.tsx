@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/Services.css";
 import { apiCall } from "../utils/api";
+import { API_URL } from "../App";
 
 interface Service {
   id: number;
@@ -90,15 +91,12 @@ export default function Services() {
   const handleDelete = async () => {
     if (!deleteConfirmId) return;
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/services/delete/${deleteConfirmId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await fetch(`${API_URL}/services/delete/${deleteConfirmId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setServices((prev) => prev.filter((s) => s.id !== deleteConfirmId));
       setDeleteConfirmId(null);
       showToast("Service deleted successfully", "success");
@@ -300,16 +298,10 @@ export default function Services() {
               <strong>{deleteConfirmName}</strong>? This action cannot be undone.
             </p>
             <div className="confirm-actions">
-              <button
-                className="confirm-cancel-btn"
-                onClick={() => setDeleteConfirmId(null)}
-              >
+              <button className="confirm-cancel-btn" onClick={() => setDeleteConfirmId(null)}>
                 Cancel
               </button>
-              <button
-                className="confirm-delete-btn"
-                onClick={handleDelete}
-              >
+              <button className="confirm-delete-btn" onClick={handleDelete}>
                 Delete
               </button>
             </div>

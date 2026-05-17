@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import "../styles/VerifyEmail.css";
+import { API_URL } from "../App";
 
 const OTP_EXPIRY_SECONDS = 600; // 10 minutes
 
@@ -68,7 +69,7 @@ export default function VerifyEmail() {
       setLoading(true);
       setError("");
 
-      const res = await fetch("http://localhost:8080/auth/verify-email", {
+      const res = await fetch(`${API_URL}/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: code }),
@@ -92,7 +93,7 @@ export default function VerifyEmail() {
       setResending(true);
       setError("");
 
-      const res = await fetch("http://localhost:8080/auth/resend-otp", {
+      const res = await fetch(`${API_URL}/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -148,7 +149,7 @@ export default function VerifyEmail() {
 
       {/* Resend */}
       <p className="resend-text">
-        Didn’t receive OTP?{" "}
+        Didn't receive OTP?{" "}
         <button
           className="resend-link"
           onClick={handleResend}
