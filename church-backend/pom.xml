@@ -67,9 +67,9 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
-    <groupId>com.resend</groupId>
-    <artifactId>resend-java</artifactId>
-    <version>3.1.0</version>
+    <groupId>com.mailjet</groupId>
+    <artifactId>mailjet-client</artifactId>
+    <version>5.2.1</version>
 </dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
