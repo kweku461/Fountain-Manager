@@ -48,6 +48,9 @@ public class FirstTimer {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "created_by")
+private String createdBy; // stores the email of the logged-in user
+
     @PrePersist
     protected void onCreate() {
         this.visitDate = LocalDate.now();
@@ -83,4 +86,6 @@ public class FirstTimer {
     public void setKnownPerson(String knownPerson) { this.knownPerson = knownPerson; }
     public LocalDate getVisitDate() { return visitDate; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 }

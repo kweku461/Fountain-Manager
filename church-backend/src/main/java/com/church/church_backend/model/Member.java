@@ -30,4 +30,7 @@ public class Member {
 
     private String phone;
     private String address;
+
+    @Column(name = "created_by")
+    private String createdBy; // stores the email of the logged-in user
 }

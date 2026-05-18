@@ -211,7 +211,8 @@ public class AuthController {
             throw new RuntimeException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        // New
+    String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         return new AuthResponse(token, user.getEmail(), user.getRole());
     }

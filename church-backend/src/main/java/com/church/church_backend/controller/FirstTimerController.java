@@ -41,50 +41,43 @@ public class FirstTimerController {
     }
 
     @GetMapping
-    public List<FirstTimer> getAll() {
-        return repository.findAll();
-    }
+public List<FirstTimer> getAll(HttpServletRequest request) {
+    String email = getEmailFromToken(request);
+    return repository.findByCreatedBy(email);
+}
 
-    @PostMapping
-    public ResponseEntity<FirstTimer> create(
-            @RequestBody FirstTimer firstTimer,
-            HttpServletRequest request
-    ) {
-        FirstTimer saved = repository.save(firstTimer);
+@PostMapping
+public ResponseEntity<FirstTimer> create(
+        @RequestBody FirstTimer firstTimer,
+        HttpServletRequest request
+) {
+    String email = getEmailFromToken(request);
+    firstTimer.setCreatedBy(email); // tag to this user
+    FirstTimer saved = repository.save(firstTimer);
 
-        try {
-            Church church = churchRepository.findById(1L).orElse(null);
-            boolean alertEnabled = church != null ? church.isFirstTimerAlert() : true;
+    try {
+        Church church = churchRepository.findById(1L).orElse(null);
+        boolean alertEnabled = church != null ? church.isFirstTimerAlert() : true;
 
-            System.out.println("📧 First timer alert enabled: " + alertEnabled);
+        if (alertEnabled) {
+            List<String> recipients = getAlertRecipients(church);
 
-            if (alertEnabled) {
-                List<String> recipients = getAlertRecipients(church);
-
-                if (!recipients.isEmpty()) {
-                    System.out.println("📧 Sending alert to " + recipients.size() + " recipient(s): " + recipients);
-                    for (String email : recipients) {
-                        emailService.sendFirstTimerAlert(email, saved.getFullName(), saved.getPhoneNumber());
-                    }
-                    System.out.println("✅ First timer alerts sent successfully");
-                } else {
-                    // Fallback: send to logged-in user only
-                    String loggedInEmail = getEmailFromToken(request);
-                    if (loggedInEmail != null) {
-                        System.out.println("📧 No recipients configured, falling back to: " + loggedInEmail);
-                        emailService.sendFirstTimerAlert(loggedInEmail, saved.getFullName(), saved.getPhoneNumber());
-                    } else {
-                        System.err.println("⚠️ No alert recipients configured and no logged-in user found");
-                    }
+            if (!recipients.isEmpty()) {
+                for (String recipient : recipients) {
+                    emailService.sendFirstTimerAlert(recipient, saved.getFullName(), saved.getPhoneNumber());
+                }
+            } else {
+                if (email != null) {
+                    emailService.sendFirstTimerAlert(email, saved.getFullName(), saved.getPhoneNumber());
                 }
             }
-        } catch (Exception e) {
-            System.err.println("⚠️ Failed to send first timer alert: " + e.getMessage());
-            e.printStackTrace();
         }
-
-        return ResponseEntity.ok(saved);
+    } catch (Exception e) {
+        System.err.println("⚠️ Failed to send first timer alert: " + e.getMessage());
     }
+
+    return ResponseEntity.ok(saved);
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

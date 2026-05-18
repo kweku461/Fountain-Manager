@@ -2,6 +2,7 @@ package com.church.church_backend.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,9 @@ public class ChurchService {
     private LocalDateTime endTime;
     private String preacher;
     private boolean livestreamAvailable = false;
+
+    @Column(name = "created_by")
+    private String createdBy; // email of the logged-in user who created this service
 
     public ChurchService() {}
 
@@ -59,4 +63,7 @@ public class ChurchService {
 
     public boolean isLivestreamAvailable() { return livestreamAvailable; }
     public void setLivestreamAvailable(boolean livestreamAvailable) { this.livestreamAvailable = livestreamAvailable; }
+
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 }
