@@ -48,7 +48,7 @@ export default function Login() {
       if (!response.ok) {
         const errorMsg = response.error || "";
         if (errorMsg.toLowerCase().includes("not verified")) {
-          setUnverifiedEmail(email); // show verify link
+          setUnverifiedEmail(email);
         } else {
           setError("Invalid email or password");
         }
@@ -122,14 +122,27 @@ export default function Login() {
         {/* Error message */}
         {error && <div className="error-message">{error}</div>}
 
+        {/* Email not verified message */}
+        {unverifiedEmail && (
+          <div className="error-message" style={{ textAlign: "center" }}>
+            Your email is not verified.{" "}
+            <span
+              style={{ color: "#4F46E5", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}
+              onClick={() => navigate("/verify-email", { state: { email: unverifiedEmail } })}
+            >
+              Click here to verify
+            </span>
+          </div>
+        )}
+
         {/* Forgot password */}
         <div className="forgot">
           <a href="/forgot-password">Forgot Password?</a>
         </div>
 
         {/* Button */}
-        <button 
-          className="login-btn" 
+        <button
+          className="login-btn"
           onClick={handleLogin}
           disabled={loading}
         >
