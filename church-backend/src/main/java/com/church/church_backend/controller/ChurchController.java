@@ -6,29 +6,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.church.church_backend.model.Church;
 import com.church.church_backend.repository.ChurchRepository;
+import com.church.church_backend.security.JwtUtil;
 
 @RestController
 @RequestMapping("/api/church")
 public class ChurchController {
 
     private final ChurchRepository churchRepository;
+    private final JwtUtil jwtUtil;
 
-    public ChurchController(ChurchRepository churchRepository) {
+    public ChurchController(ChurchRepository churchRepository, JwtUtil jwtUtil) {
         this.churchRepository = churchRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     // ── GET /api/church ──
     @GetMapping
-    public ResponseEntity<?> getChurchInfo() {
-        return churchRepository.findById(1L)
+    public ResponseEntity<?> getChurchInfo(HttpServletRequest request) {
+        String email = getEmailFromToken(request);
+
+        return churchRepository.findByCreatedBy(email)
                 .map(church -> {
-                    // Use HashMap instead of Map.of() — supports null-safe values
                     Map<String, Object> result = new HashMap<>();
                     result.put("churchName",      church.getChurchName()  != null ? church.getChurchName()  : "");
                     result.put("address",         church.getAddress()     != null ? church.getAddress()     : "");
@@ -39,6 +44,7 @@ public class ChurchController {
                     return ResponseEntity.ok(result);
                 })
                 .orElseGet(() -> {
+                    // No church info yet for this user — return empty defaults
                     Map<String, Object> defaults = new HashMap<>();
                     defaults.put("churchName",      "");
                     defaults.put("address",         "");
@@ -52,14 +58,23 @@ public class ChurchController {
 
     // ── PUT /api/church ──
     @PutMapping
-    public ResponseEntity<?> updateChurchInfo(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> updateChurchInfo(
+            @RequestBody Map<String, Object> body,
+            HttpServletRequest request) {
         try {
-            Church church = churchRepository.findById(1L).orElse(new Church());
+            String email = getEmailFromToken(request);
 
-            // churchName: use existing DB value as fallback so recipients-only saves don't fail
+            // Find existing church for this user or create a new one
+            Church church = churchRepository.findByCreatedBy(email)
+                    .orElse(new Church());
+
+            // Tag to this user if new
+            if (church.getCreatedBy() == null) {
+                church.setCreatedBy(email);
+            }
+
             String churchName = (String) body.get("churchName");
             if (churchName == null || churchName.isBlank()) {
-                // Fall back to whatever is already saved
                 churchName = church.getChurchName();
             }
             if (churchName == null || churchName.isBlank()) {
@@ -77,7 +92,6 @@ public class ChurchController {
                 church.setFirstTimerAlert((Boolean) alertVal);
             }
 
-            // Save alert emails — accept a JSON array from frontend
             Object emailsVal = body.get("alertEmails");
             if (emailsVal instanceof List<?> emailList) {
                 String joined = emailList.stream()
@@ -115,5 +129,16 @@ public class ChurchController {
                 .map(String::trim)
                 .filter(e -> !e.isBlank())
                 .collect(Collectors.toList());
+    }
+
+    // ── Helper: extract email from JWT ──
+    private String getEmailFromToken(HttpServletRequest request) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
+            return jwtUtil.extractUsername(authHeader.substring(7));
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -40,51 +40,87 @@ public class FirstTimerController {
         this.jwtUtil = jwtUtil;
     }
 
+    // ── Get all first timers for logged-in user ──
     @GetMapping
-public List<FirstTimer> getAll(HttpServletRequest request) {
-    String email = getEmailFromToken(request);
-    return repository.findByCreatedBy(email);
-}
-
-@PostMapping
-public ResponseEntity<FirstTimer> create(
-        @RequestBody FirstTimer firstTimer,
-        HttpServletRequest request
-) {
-    String email = getEmailFromToken(request);
-    firstTimer.setCreatedBy(email); // tag to this user
-    FirstTimer saved = repository.save(firstTimer);
-
-    try {
-        Church church = churchRepository.findById(1L).orElse(null);
-        boolean alertEnabled = church != null ? church.isFirstTimerAlert() : true;
-
-        if (alertEnabled) {
-            List<String> recipients = getAlertRecipients(church);
-
-            if (!recipients.isEmpty()) {
-                for (String recipient : recipients) {
-                    emailService.sendFirstTimerAlert(recipient, saved.getFullName(), saved.getPhoneNumber());
-                }
-            } else {
-                if (email != null) {
-                    emailService.sendFirstTimerAlert(email, saved.getFullName(), saved.getPhoneNumber());
-                }
-            }
-        }
-    } catch (Exception e) {
-        System.err.println("⚠️ Failed to send first timer alert: " + e.getMessage());
+    public List<FirstTimer> getAll(HttpServletRequest request) {
+        String email = getEmailFromToken(request);
+        return repository.findByCreatedBy(email);
     }
 
-    return ResponseEntity.ok(saved);
-}
+    // ── Create first timer from inside the app (authenticated) ──
+    @PostMapping
+    public ResponseEntity<FirstTimer> create(
+            @RequestBody FirstTimer firstTimer,
+            HttpServletRequest request
+    ) {
+        String email = getEmailFromToken(request);
+        firstTimer.setCreatedBy(email);
+        FirstTimer saved = repository.save(firstTimer);
 
+        try {
+            Church church = email != null
+                    ? churchRepository.findByCreatedBy(email).orElse(null)
+                    : null;
+            boolean alertEnabled = church != null ? church.isFirstTimerAlert() : true;
+
+            if (alertEnabled) {
+                List<String> recipients = getAlertRecipients(church);
+
+                if (!recipients.isEmpty()) {
+                    for (String recipient : recipients) {
+                        emailService.sendFirstTimerAlert(recipient, saved.getFullName(), saved.getPhoneNumber());
+                    }
+                } else {
+                    if (email != null) {
+                        emailService.sendFirstTimerAlert(email, saved.getFullName(), saved.getPhoneNumber());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send first timer alert: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok(saved);
+    }
+
+    // ── Public endpoint for QR code submissions ──
+    @PostMapping("/public")
+    public ResponseEntity<FirstTimer> createPublic(@RequestBody FirstTimer firstTimer) {
+        String ownerEmail = firstTimer.getCreatedBy(); // ← declared once here
+        FirstTimer saved = repository.save(firstTimer);
+
+        try {
+            Church church = ownerEmail != null
+                    ? churchRepository.findByCreatedBy(ownerEmail).orElse(null)
+                    : null;
+            boolean alertEnabled = church != null ? church.isFirstTimerAlert() : true;
+
+            if (alertEnabled) {
+                List<String> recipients = getAlertRecipients(church);
+
+                if (!recipients.isEmpty()) {
+                    for (String recipient : recipients) {
+                        emailService.sendFirstTimerAlert(recipient, saved.getFullName(), saved.getPhoneNumber());
+                    }
+                } else if (ownerEmail != null) {
+                    emailService.sendFirstTimerAlert(ownerEmail, saved.getFullName(), saved.getPhoneNumber());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send first timer alert: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok(saved);
+    }
+
+    // ── Delete first timer ──
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    // ── Helpers ──
     private List<String> getAlertRecipients(Church church) {
         if (church == null) return List.of();
         String raw = church.getAlertEmails();

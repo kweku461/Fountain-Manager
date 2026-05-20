@@ -51,7 +51,8 @@ const showToast = (message: string, type: "success" | "error") => {
   setToast({ message, type });
   setTimeout(() => setToast(null), 3000);
 };
-  const REGISTER_URL = `${window.location.origin}/first-timers/register`;
+  const userEmail = localStorage.getItem("email") || "";
+const REGISTER_URL = `${window.location.origin}/first-timers/register?ref=${encodeURIComponent(userEmail)}`;
 
   useEffect(() => {
     fetchFirstTimers();

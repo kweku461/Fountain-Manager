@@ -29,7 +29,6 @@ interface ChurchData {
 
 export default function SettingsPage() {
   const location = useLocation();
-
   const navigate = useNavigate();
 
   /* ── Profile state ── */
@@ -63,7 +62,7 @@ export default function SettingsPage() {
   const [emailError, setEmailError]         = useState("");
   const [savingEmails, setSavingEmails]     = useState(false);
 
-  /* ── Ref to always hold latest alertEmails (avoids React closure stale state) ── */
+  /* ── Ref to always hold latest alertEmails ── */
   const alertEmailsRef = useRef<string[]>([]);
 
   /* ── Auto-open profile if navigated from Profile nav button ── */
@@ -97,7 +96,7 @@ export default function SettingsPage() {
     apiCall<ChurchData>("/api/church", { method: "GET" }).then((res) => {
       if (res.ok && res.data) {
         const emails = Array.isArray(res.data.alertEmails) ? res.data.alertEmails : [];
-        alertEmailsRef.current = emails; // sync ref on load
+        alertEmailsRef.current = emails;
         setChurchForm({
           churchName:      res.data.churchName      || "",
           address:         res.data.address         || "",
@@ -180,22 +179,13 @@ export default function SettingsPage() {
   const handleAddEmail = () => {
     setEmailError("");
     const trimmed = newEmail.trim().toLowerCase();
-
     if (!trimmed) { setEmailError("Please enter an email address."); return; }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmed)) { setEmailError("Please enter a valid email address."); return; }
-
-    if (alertEmailsRef.current.includes(trimmed)) {
-      setEmailError("This email is already in the list."); return;
-    }
-
-    if (alertEmailsRef.current.length >= 3) {
-      setEmailError("Maximum of 3 recipients allowed."); return;
-    }
-
+    if (alertEmailsRef.current.includes(trimmed)) { setEmailError("This email is already in the list."); return; }
+    if (alertEmailsRef.current.length >= 3) { setEmailError("Maximum of 3 recipients allowed."); return; }
     const updated = [...alertEmailsRef.current, trimmed];
-    alertEmailsRef.current = updated; // update ref immediately
+    alertEmailsRef.current = updated;
     setChurchForm((prev) => ({ ...prev, alertEmails: updated }));
     setNewEmail("");
   };
@@ -203,27 +193,33 @@ export default function SettingsPage() {
   /* ── Remove email from list ── */
   const handleRemoveEmail = (email: string) => {
     const updated = alertEmailsRef.current.filter((e) => e !== email);
-    alertEmailsRef.current = updated; // update ref immediately
+    alertEmailsRef.current = updated;
     setChurchForm((prev) => ({ ...prev, alertEmails: updated }));
   };
 
   /* ── Save recipients to backend ── */
   const handleSaveRecipients = async () => {
+    setEmailError("");
+
+    // Auto-add any typed email before saving
+    if (newEmail.trim()) {
+      const trimmed = newEmail.trim().toLowerCase();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmed)) { setEmailError("Please enter a valid email address."); return; }
+      if (alertEmailsRef.current.includes(trimmed)) { setEmailError("This email is already in the list."); return; }
+      if (alertEmailsRef.current.length >= 3) { setEmailError("Maximum of 3 recipients allowed."); return; }
+      const updated = [...alertEmailsRef.current, trimmed];
+      alertEmailsRef.current = updated;
+      setChurchForm((prev) => ({ ...prev, alertEmails: updated }));
+      setNewEmail("");
+    }
+
     setSavingEmails(true);
-
-    // Use ref so we always get the latest emails, not stale closure state
     const payload = { ...churchForm, alertEmails: alertEmailsRef.current };
-
-    console.log("📧 Saving recipients:", alertEmailsRef.current);
-    console.log("📧 Full payload:", JSON.stringify(payload));
-
     const res = await apiCall("/api/church", {
       method: "PUT",
       body: JSON.stringify(payload),
     });
-
-    console.log("📧 Response:", res);
-
     setSavingEmails(false);
     if (!res.ok) {
       showToast(res.error || "Failed to save recipients", "error");
@@ -233,6 +229,7 @@ export default function SettingsPage() {
     }
   };
 
+  /* ── Export ── */
   const handleExport = (type: "members" | "attendance" | "firstTimers") => {
     const labels: Record<string, string> = {
       members: "members", attendance: "attendance", firstTimers: "first-timers",
@@ -405,8 +402,6 @@ export default function SettingsPage() {
 
           {notifOpen && (
             <div className="settings-form">
-
-              {/* First timer alert toggle */}
               <div className="settings-toggle-row">
                 <div>
                   <p className="settings-toggle-label">New first timer registered</p>
@@ -422,7 +417,6 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              {/* Alert recipients — only shown when toggle is on */}
               {churchForm.firstTimerAlert && (
                 <div className="recipients-section">
                   <div
@@ -445,8 +439,6 @@ export default function SettingsPage() {
 
                   {recipientsOpen && (
                     <div className="recipients-body">
-
-                      {/* Existing recipients */}
                       {churchForm.alertEmails.length === 0 ? (
                         <p className="recipients-empty">No recipients yet. Add up to 3 emails below.</p>
                       ) : (
@@ -466,7 +458,6 @@ export default function SettingsPage() {
                         </div>
                       )}
 
-                      {/* Add new email */}
                       {churchForm.alertEmails.length < 3 && (
                         <div className="recipient-add-row">
                           <input
@@ -501,7 +492,6 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              {/* Attendance reminder — coming soon */}
               <div className="settings-toggle-row">
                 <div>
                   <p className="settings-toggle-label">Attendance reminders</p>
@@ -512,7 +502,6 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              {/* Weekly report — coming soon */}
               <div className="settings-toggle-row">
                 <div>
                   <p className="settings-toggle-label">Weekly summary</p>

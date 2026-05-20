@@ -33,12 +33,17 @@ export default function FirstTimerRegister() {
       alert("Please fill in your name and phone number.");
       return;
     }
+
+    // Read the ref (createdBy) from the URL
+    const params = new URLSearchParams(window.location.search);
+    const createdBy = params.get("ref") || null;
+
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/first-timers`, {
+      const res = await fetch(`${API_URL}/api/first-timers/public`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, createdBy }),
       });
       if (res.ok) {
         setSubmitted(true);

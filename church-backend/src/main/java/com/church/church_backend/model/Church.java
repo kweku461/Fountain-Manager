@@ -17,13 +17,14 @@ public class Church {
     private String serviceDay;
     private String serviceTime;
 
-    // ── Notification preferences ──
+    @Column(name = "created_by")
+    private String createdBy;
+
     @Column(nullable = false)
     private boolean firstTimerAlert = true;
 
-    // ── Alert recipients (comma-separated, max 3 emails) ──
     @Column(name = "alert_emails", length = 500)
-    private String alertEmails; // e.g. "a@mail.com,b@mail.com,c@mail.com"
+    private String alertEmails;
 
     // =====================
     // GETTERS & SETTERS
@@ -42,6 +43,9 @@ public class Church {
 
     public String getServiceTime() { return serviceTime; }
     public void setServiceTime(String serviceTime) { this.serviceTime = serviceTime; }
+
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
     public boolean isFirstTimerAlert() { return firstTimerAlert; }
     public void setFirstTimerAlert(boolean firstTimerAlert) { this.firstTimerAlert = firstTimerAlert; }

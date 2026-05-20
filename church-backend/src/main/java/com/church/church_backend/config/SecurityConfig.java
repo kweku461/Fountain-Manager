@@ -73,8 +73,9 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.PUT, "/api/members/**").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/api/members/**").authenticated()
 
-                    // First Timers
-                    .requestMatchers(HttpMethod.POST, "/api/first-timers").permitAll()
+                   // First Timers
+                    .requestMatchers(HttpMethod.POST, "/api/first-timers/public").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/first-timers").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/first-timers/**").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/api/first-timers/**").authenticated()
 

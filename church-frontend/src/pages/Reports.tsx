@@ -58,6 +58,7 @@ export default function Reports() {
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [churchName, setChurchName] = useState<string>("");
 
   const token = localStorage.getItem("token");
   const headers = {
@@ -68,6 +69,7 @@ export default function Reports() {
   useEffect(() => {
     fetchServices();
     fetchTotalMembers();
+    fetchChurchName();
   }, []);
 
   const fetchServices = async () => {
@@ -91,6 +93,7 @@ export default function Reports() {
       console.error("Failed to fetch members:", err);
     }
   };
+  
 
   const handleGenerate = async () => {
     if (!selectedServiceId) {
@@ -140,6 +143,16 @@ export default function Reports() {
     }
   };
 
+const fetchChurchName = async () => {
+    try {
+        const res = await fetch(`${API_URL}/api/church`, { headers });
+        if (!res.ok) return;
+        const data = await res.json();
+        setChurchName(data.churchName || "");
+    } catch (err) {
+        console.error("Failed to fetch church name:", err);
+    }
+};
   const handleDownloadPDF = async () => {
     if (!reportRef.current) return;
     setGenerating(true);
@@ -293,7 +306,7 @@ export default function Reports() {
                 <div className="report-church-icon">
                   <FileText size={28} color="#4f46e5" />
                 </div>
-                <h1 className="report-church-name">Bomso Town Church</h1>
+                <h1 className="report-church-name">{churchName || "Your Church"}</h1>
                 <p className="report-generated-date">
                   Report generated on {new Date().toLocaleDateString("en-GB", {
                     weekday: "long", day: "numeric", month: "long", year: "numeric",
@@ -438,7 +451,7 @@ export default function Reports() {
               {/* REPORT FOOTER */}
               <div className="report-divider" />
               <div className="report-footer">
-                <p>Bomso Town Church — Confidential Report</p>
+                <p>{churchName || "Your Church"} — Confidential Report</p>
                 <p>{new Date().toLocaleDateString("en-GB")}</p>
               </div>
             </div>
