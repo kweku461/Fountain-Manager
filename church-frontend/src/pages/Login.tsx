@@ -137,7 +137,7 @@ export default function Login() {
 
         {/* Forgot password */}
         <div className="forgot">
-          <a href="/forgot-password">Forgot Password?</a>
+          <Link to="/forgot-password">Forgot Password?</Link>
         </div>
 
         {/* Button */}
