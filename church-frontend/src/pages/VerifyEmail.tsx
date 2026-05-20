@@ -124,36 +124,49 @@ export default function VerifyEmail() {
       <h1 className="verify-title">Verify Code</h1>
 
       <p className="verify-text">
-        Please enter the code we just sent to email <br />
+        Please enter the code we just sent to <br />
         <span className="verify-email">{email}</span>
       </p>
+
+      {/* Spam notice */}
+      <div className="spam-notice">
+        <span>📧</span>
+        <p>Can't find the email? Check your <strong>spam</strong> or <strong>junk</strong> folder.</p>
+      </div>
 
       {/* OTP Boxes */}
       <div className="otp-boxes">
         {otp.map((digit, i) => (
           <input
             key={i}
-            ref={(el) => { inputsRef.current[i] = el; }}
+              ref={(el) => { inputsRef.current[i] = el; }}
             type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             maxLength={1}
             value={digit}
             onChange={(e) => handleChange(e.target.value, i)}
-          />
+            autoFocus={i === 0}
+            />
         ))}
       </div>
 
       {/* Timer */}
-      <p className="timer-text">{formatTime()}</p>
+      {timeLeft > 0 ? (
+        <p className="timer-text">Code expires in {formatTime()}</p>
+      ) : (
+        <p className="timer-text expired-text">Code expired</p>
+      )}
 
       {error && <p className="error-text">{error}</p>}
 
-      {/* Resend */}
+      {/* Resend — always show, disable only while resending */}
       <p className="resend-text">
         Didn't receive OTP?{" "}
         <button
           className="resend-link"
           onClick={handleResend}
-          disabled={resending || timeLeft > 0}
+          disabled={resending}
         >
           {resending ? "Resending..." : "Resend code"}
         </button>

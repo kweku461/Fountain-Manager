@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Home, Calendar, Settings, User,
-  Search, MoreHorizontal, Plus, ChevronLeft,
+  Home, Calendar, Settings,
+  Search, MoreHorizontal, Plus, 
   Clock, Users, X,
+  CheckCircle,
+  ArrowLeft,
 } from "lucide-react";
 import { API_URL } from "../App";
 import "../styles/Attendance.css";
@@ -132,7 +134,7 @@ export default function Attendance() {
       <div className="att-header-card">
         <div className="att-header-top">
           <button className="att-back-btn" onClick={() => navigate("/dashboard")}>
-            <ChevronLeft size={20} />
+              <ArrowLeft size={20} />
           </button>
           <h2 className="att-title">Attendance</h2>
           <div className="att-dots-btn">
@@ -236,17 +238,17 @@ export default function Attendance() {
 
       {/* BOTTOM NAV */}
       <div className="bottom-nav">
-        <div className="nav-item active">
+        <div className="nav-item" onClick={() => navigate("/dashboard")}>
           <Home size={22} /><span>Home</span>
+        </div>
+        <div className="nav-item active">
+          <CheckCircle size={22} /><span>Attendance</span>
         </div>
         <div className="nav-item">
           <Calendar size={22} /><span>Calendar</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/settings")}>
           <Settings size={22} /><span>Settings</span>
-        </div>
-        <div className="nav-item">
-          <User size={22} /><span>Profile</span>
         </div>
       </div>
 

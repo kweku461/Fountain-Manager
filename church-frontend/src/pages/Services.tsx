@@ -242,8 +242,10 @@ export default function Services() {
         <div className="nav-item active">
           <Settings size={22} /><span>Services</span>
         </div>
-        <div className="nav-item">
-          <User size={22} /><span>Profile</span>
+        {/* Profile — opens Settings with profile section expanded */}
+        <div className="nav-item clickable" onClick={() => navigate("/settings", { state: { openProfile: true } })}>
+          <User size={22} />
+          <span>Profile</span>
         </div>
       </div>
 

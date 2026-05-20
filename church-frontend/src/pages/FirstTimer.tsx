@@ -259,21 +259,21 @@ const showToast = (message: string, type: "success" | "error") => {
 
       {/* BOTTOM NAV */}
       <div className="bottom-nav">
-        <div className="nav-item active">
+        <div className="nav-item" onClick={() => navigate("/dashboard")}>
           <Home size={22} />
           <span>Home</span>
+        </div>
+        <div className="nav-item active">
+          <User size={22} />
+          <span>Profile</span>
         </div>
         <div className="nav-item">
           <Calendar size={22} />
           <span>Calendar</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/settings")}>
           <Settings size={22} />
           <span>Settings</span>
-        </div>
-        <div className="nav-item">
-          <User size={22} />
-          <span>Profile</span>
         </div>
       </div>
 

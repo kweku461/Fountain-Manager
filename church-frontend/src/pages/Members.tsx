@@ -243,7 +243,7 @@ export default function Members() {
         <div className="nav-item">
           <Calendar size={22} /><span>Calendar</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/settings")}>
           <Settings size={22} /><span>Settings</span>
         </div>
       </div>

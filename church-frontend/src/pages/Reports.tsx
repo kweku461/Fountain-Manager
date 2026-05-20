@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ChevronLeft, MoreHorizontal, FileText,
-  Download, Home, Calendar, Settings, User,
+  ArrowLeft, MoreHorizontal, FileText,
+  Download, Home, Calendar, Settings, 
 } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -214,7 +214,7 @@ export default function Reports() {
       <div className="reports-header-card">
         <div className="reports-header-top">
           <button className="reports-back-btn" onClick={() => navigate("/dashboard")}>
-            <ChevronLeft size={20} />
+            <ArrowLeft size={20} />
           </button>
           <h2 className="reports-title">Reports</h2>
           <div className="reports-dots-btn">
@@ -451,15 +451,16 @@ export default function Reports() {
         <div className="nav-item" onClick={() => navigate("/dashboard")}>
           <Home size={22} /><span>Home</span>
         </div>
+        <div className="nav-item active">
+          <FileText size={22} /><span>Reports</span>
+        </div>
         <div className="nav-item">
           <Calendar size={22} /><span>Calendar</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/settings")}>
           <Settings size={22} /><span>Settings</span>
         </div>
-        <div className="nav-item">
-          <User size={22} /><span>Profile</span>
-        </div>
+        
       </div>
     </div>
   );

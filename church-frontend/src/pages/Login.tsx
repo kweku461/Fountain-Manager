@@ -11,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
   const navigate = useNavigate();
 
   const validateEmail = (email: string): boolean => {
@@ -20,8 +21,8 @@ export default function Login() {
 
   const handleLogin = async () => {
     setError("");
+    setUnverifiedEmail("");
 
-    // Frontend validation
     if (!email || !password) {
       setError("Please enter both email and password");
       return;
@@ -40,12 +41,17 @@ export default function Login() {
         {
           method: "POST",
           body: JSON.stringify({ email, password }),
-          skipAuth: true, // Login doesn't need authentication
+          skipAuth: true,
         }
       );
 
       if (!response.ok) {
-        setError(response.error || "Invalid email or password");
+        const errorMsg = response.error || "";
+        if (errorMsg.toLowerCase().includes("not verified")) {
+          setUnverifiedEmail(email); // show verify link
+        } else {
+          setError("Invalid email or password");
+        }
         return;
       }
 
@@ -55,7 +61,7 @@ export default function Login() {
         localStorage.setItem("role", response.data.role);
         navigate("/dashboard");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
