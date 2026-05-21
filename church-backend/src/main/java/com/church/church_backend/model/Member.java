@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "members")
@@ -31,6 +32,9 @@ public class Member {
     private String phone;
     private String address;
 
+    private LocalDate birthdate;
+    private String basonta; // church department
     @Column(name = "created_by")
     private String createdBy; // stores the email of the logged-in user
+
 }

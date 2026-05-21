@@ -25,6 +25,8 @@ interface Member {
   phone: string;
   address: string;
   email: string;
+  birthdate?: string;
+  basonta?: string;
 }
 
 export default function Members() {
@@ -270,6 +272,8 @@ export default function Members() {
                 { label: "Phone", value: selectedMember.phone },
                 { label: "Address", value: selectedMember.address },
                 { label: "Email", value: selectedMember.email },
+                { label: "Birth date", value: selectedMember.birthdate },
+                { label: "Basonta", value: selectedMember.basonta },
               ]
                 .filter((row) => row.value)
                 .map((row) => (
@@ -302,7 +306,7 @@ export default function Members() {
             </div>
 
             <div className="edit-form">
-              {["firstName", "lastName", "phone", "address", "email"].map((field) => (
+              {["firstName", "lastName", "phone", "address", "email", "birthdate", "basonta"].map((field) => (
                 <div className="edit-field" key={field}>
                   <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
                   <input

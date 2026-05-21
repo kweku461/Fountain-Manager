@@ -4,11 +4,20 @@ import { useState } from "react";
 import "../styles/CreateMember.css";
 import { apiCall } from "../utils/api";
 
+const BASONTA_OPTIONS = [
+  "Choir",
+  "Ushers/Flowers",
+  "Media(High Speed, Photography, Sound, Live Streaming, Content Creation)",
+  "Film Stars",
+  "Dancing Stars",
+  "Light Bearers",
+  "Christian Pop Stars",
+];
+
 export default function CreateMember() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If coming from edit, location.state will have the member data
   const editMember = location.state?.member || null;
   const isEditing = !!editMember;
 
@@ -17,6 +26,8 @@ export default function CreateMember() {
   const [email, setEmail] = useState(editMember?.email || "");
   const [address, setAddress] = useState(editMember?.address || "");
   const [phone, setPhone] = useState(editMember?.phone || "");
+  const [birthdate, setBirthdate] = useState(editMember?.birthdate || "");
+  const [basonta, setBasonta] = useState(editMember?.basonta || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,7 +52,15 @@ export default function CreateMember() {
         isEditing ? `/api/members/${editMember.id}` : "/api/members",
         {
           method: isEditing ? "PUT" : "POST",
-          body: JSON.stringify({ firstName, lastName, email, address, phone }),
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            address,
+            phone,
+            birthdate: birthdate || null,
+            basonta: basonta || null,
+          }),
         }
       );
 
@@ -109,6 +128,31 @@ export default function CreateMember() {
           onChange={(e) => setPhone(e.target.value)}
           disabled={loading}
         />
+
+        {/* BIRTHDATE */}
+        <input
+  type="text"
+  placeholder="Birth date...."
+  value={birthdate}
+  onChange={(e) => setBirthdate(e.target.value)}
+  onFocus={(e) => (e.target.type = "date")}
+  onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+  disabled={loading}
+  className="date-input"
+/>
+
+        {/* BASONTA */}
+        <select
+  value={basonta}
+  onChange={(e) => setBasonta(e.target.value)}
+  disabled={loading}
+  className="basonta-select"
+>
+  <option value="">Select Basonta....</option>
+  {BASONTA_OPTIONS.map((opt) => (
+    <option key={opt} value={opt}>{opt}</option>
+  ))}
+</select>
       </div>
 
       {/* ACTION BUTTONS */}

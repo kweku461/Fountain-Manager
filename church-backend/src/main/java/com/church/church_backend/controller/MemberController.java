@@ -60,6 +60,8 @@ public class MemberController {
                     m.setEmail(memberDetails.getEmail());
                     m.setPhone(memberDetails.getPhone());
                     m.setAddress(memberDetails.getAddress());
+                    m.setBirthdate(memberDetails.getBirthdate());
+                    m.setBasonta(memberDetails.getBasonta());
                     return ResponseEntity.ok(memberRepository.save(m));
                 })
                 .orElse(ResponseEntity.notFound().build());

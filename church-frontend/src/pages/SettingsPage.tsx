@@ -17,6 +17,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import "../styles/SettingsPage.css";
 import { apiCall } from "../utils/api";
+import { API_URL } from "../App";
 
 interface ChurchData {
   churchName: string;
@@ -25,6 +26,12 @@ interface ChurchData {
   serviceTime: string;
   firstTimerAlert: boolean;
   alertEmails: string[];
+}
+
+interface ServiceOption {
+  id: number;
+  title: string;
+  startTime: string;
 }
 
 export default function SettingsPage() {
@@ -61,6 +68,14 @@ export default function SettingsPage() {
   const [newEmail, setNewEmail]             = useState("");
   const [emailError, setEmailError]         = useState("");
   const [savingEmails, setSavingEmails]     = useState(false);
+
+  /* ── Export state ── */
+  const [exportModal, setExportModal] = useState<"members" | "attendance" | "firstTimers" | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [services, setServices] = useState<ServiceOption[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [ftStartDate, setFtStartDate] = useState("");
+  const [ftEndDate, setFtEndDate] = useState("");
 
   /* ── Ref to always hold latest alertEmails ── */
   const alertEmailsRef = useRef<string[]>([]);
@@ -108,6 +123,19 @@ export default function SettingsPage() {
       }
     });
   }, []);
+
+  /* ── Load services for attendance export ── */
+  useEffect(() => {
+    if (exportModal === "attendance") {
+      const token = localStorage.getItem("token");
+      fetch(`${API_URL}/services`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setServices(Array.isArray(data) ? data : []))
+        .catch(() => setServices([]));
+    }
+  }, [exportModal]);
 
   /* ── Save profile ── */
   const handleProfileSave = async () => {
@@ -200,8 +228,6 @@ export default function SettingsPage() {
   /* ── Save recipients to backend ── */
   const handleSaveRecipients = async () => {
     setEmailError("");
-
-    // Auto-add any typed email before saving
     if (newEmail.trim()) {
       const trimmed = newEmail.trim().toLowerCase();
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -213,7 +239,6 @@ export default function SettingsPage() {
       setChurchForm((prev) => ({ ...prev, alertEmails: updated }));
       setNewEmail("");
     }
-
     setSavingEmails(true);
     const payload = { ...churchForm, alertEmails: alertEmailsRef.current };
     const res = await apiCall("/api/church", {
@@ -229,12 +254,149 @@ export default function SettingsPage() {
     }
   };
 
-  /* ── Export ── */
-  const handleExport = (type: "members" | "attendance" | "firstTimers") => {
-    const labels: Record<string, string> = {
-      members: "members", attendance: "attendance", firstTimers: "first-timers",
-    };
-    alert(`Exporting ${labels[type]} data…\n(Connect this to your API export endpoint)`);
+  /* ── CSV helper ── */
+  const downloadCSV = (filename: string, rows: string[][]) => {
+    const csv = rows.map((r) => r.map((v) => `"${(v ?? "").toString().replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  /* ── Export Members ── */
+  const handleExportMembers = async () => {
+    setExportLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/members`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      const rows = [
+        ["First Name", "Last Name", "Email", "Phone", "Address", "Date of Birth", "Basonta"],
+        ...data.map((m: any) => [
+          m.firstName || "",
+          m.lastName || "",
+          m.email || "",
+          m.phone || "",
+          m.address || "",
+          m.dateOfBirth || "",
+          m.basonta || "",
+        ]),
+      ];
+      downloadCSV(`members-${new Date().toLocaleDateString("en-GB").replace(/\//g, "-")}.csv`, rows);
+      setExportModal(null);
+      showToast("Members exported successfully", "success");
+    } catch {
+      showToast("Failed to export members", "error");
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  /* ── Export First Timers ── */
+  const handleExportFirstTimers = async () => {
+    if (!ftStartDate || !ftEndDate) {
+      showToast("Please select a date range", "error");
+      return;
+    }
+    setExportLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/first-timers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      // Filter by date range
+      const filtered = data.filter((ft: any) => {
+        if (!ft.visitDate) return false;
+        const visit = new Date(ft.visitDate);
+        const start = new Date(ftStartDate);
+        const end = new Date(ftEndDate);
+        end.setHours(23, 59, 59);
+        return visit >= start && visit <= end;
+      });
+
+      if (filtered.length === 0) {
+        showToast("No first timers found in this date range", "error");
+        setExportLoading(false);
+        return;
+      }
+
+      const rows = [
+        ["Full Name", "Phone", "WhatsApp", "Course", "Year", "Occupation", "Area", "Hostel", "Room", "Join Church", "Join Basonta", "Basonta Choice", "Known Person", "Visit Date"],
+        ...filtered.map((ft: any) => [
+          ft.fullName || "",
+          ft.phoneNumber || "",
+          ft.whatsappNumber || "",
+          ft.course || "",
+          ft.year || "",
+          ft.occupation || "",
+          ft.area || "",
+          ft.hostel || "",
+          ft.roomNumber || "",
+          ft.joinChurch || "",
+          ft.joinBasonta || "",
+          ft.basontaChoice || "",
+          ft.knownPerson || "",
+          ft.visitDate || "",
+        ]),
+      ];
+      downloadCSV(`first-timers-${ftStartDate}-to-${ftEndDate}.csv`, rows);
+      setExportModal(null);
+      showToast(`${filtered.length} first timers exported`, "success");
+    } catch {
+      showToast("Failed to export first timers", "error");
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  /* ── Export Attendance ── */
+  const handleExportAttendance = async () => {
+    if (!selectedServiceId) {
+      showToast("Please select a service", "error");
+      return;
+    }
+    setExportLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/attendance/service/${selectedServiceId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        showToast("No attendance records for this service", "error");
+        setExportLoading(false);
+        return;
+      }
+
+      const service = services.find((s) => s.id === Number(selectedServiceId));
+      const rows = [
+        ["Member Name", "Email", "Phone", "Status", "Check-in Time", "Service", "Service Date"],
+        ...data.map((a: any) => [
+          `${a.member?.firstName || ""} ${a.member?.lastName || ""}`.trim(),
+          a.member?.email || "",
+          a.member?.phone || "",
+          a.status || "",
+          a.checkInTime ? new Date(a.checkInTime).toLocaleString("en-GB") : "",
+          service?.title || "",
+          service?.startTime ? new Date(service.startTime).toLocaleDateString("en-GB") : "",
+        ]),
+      ];
+      downloadCSV(`attendance-${service?.title || "service"}-${new Date().toLocaleDateString("en-GB").replace(/\//g, "-")}.csv`, rows);
+      setExportModal(null);
+      showToast(`${data.length} attendance records exported`, "success");
+    } catch {
+      showToast("Failed to export attendance", "error");
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   return (
@@ -529,14 +691,89 @@ export default function SettingsPage() {
             </div>
           </div>
           <div className="settings-export-btns">
-            <button className="export-btn" onClick={() => handleExport("members")}>Members</button>
-            <button className="export-btn" onClick={() => handleExport("attendance")}>Attendance</button>
-            <button className="export-btn" onClick={() => handleExport("firstTimers")}>First timers</button>
+            <button className="export-btn" onClick={() => setExportModal("members")}>Members</button>
+            <button className="export-btn" onClick={() => setExportModal("attendance")}>Attendance</button>
+            <button className="export-btn" onClick={() => setExportModal("firstTimers")}>First timers</button>
           </div>
         </div>
 
         <p className="settings-version">Fountain Manager · v1.0.0</p>
       </div>
+
+      {/* ── EXPORT MODALS ── */}
+
+      {/* Members export modal */}
+      {exportModal === "members" && (
+        <div className="modal-overlay" onClick={() => setExportModal(null)}>
+          <div className="export-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="export-modal-header">
+              <h3>Export Members</h3>
+              <button className="modal-close-btn" onClick={() => setExportModal(null)}>
+                <X size={18} />
+              </button>
+            </div>
+            <p className="export-modal-sub">All your members will be exported as a CSV file.</p>
+            <button className="export-modal-btn" onClick={handleExportMembers} disabled={exportLoading}>
+              {exportLoading ? "Exporting…" : "Download CSV"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* First timers export modal */}
+      {exportModal === "firstTimers" && (
+        <div className="modal-overlay" onClick={() => setExportModal(null)}>
+          <div className="export-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="export-modal-header">
+              <h3>Export First Timers</h3>
+              <button className="modal-close-btn" onClick={() => setExportModal(null)}>
+                <X size={18} />
+              </button>
+            </div>
+            <p className="export-modal-sub">Select a date range to filter first timers by visit date.</p>
+            <div className="export-modal-field">
+              <label>From</label>
+              <input type="date" value={ftStartDate} onChange={(e) => setFtStartDate(e.target.value)} />
+            </div>
+            <div className="export-modal-field">
+              <label>To</label>
+              <input type="date" value={ftEndDate} onChange={(e) => setFtEndDate(e.target.value)} />
+            </div>
+            <button className="export-modal-btn" onClick={handleExportFirstTimers} disabled={exportLoading}>
+              {exportLoading ? "Exporting…" : "Download CSV"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Attendance export modal */}
+      {exportModal === "attendance" && (
+        <div className="modal-overlay" onClick={() => setExportModal(null)}>
+          <div className="export-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="export-modal-header">
+              <h3>Export Attendance</h3>
+              <button className="modal-close-btn" onClick={() => setExportModal(null)}>
+                <X size={18} />
+              </button>
+            </div>
+            <p className="export-modal-sub">Select a service to export its attendance records.</p>
+            <div className="export-modal-field">
+              <label>Service</label>
+              <select value={selectedServiceId} onChange={(e) => setSelectedServiceId(e.target.value)}>
+                <option value="">Choose a service…</option>
+                {services.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.title} — {new Date(s.startTime).toLocaleDateString("en-GB")}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button className="export-modal-btn" onClick={handleExportAttendance} disabled={exportLoading}>
+              {exportLoading ? "Exporting…" : "Download CSV"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* TOAST */}
       {toast && (

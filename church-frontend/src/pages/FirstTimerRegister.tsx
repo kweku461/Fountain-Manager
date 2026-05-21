@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/FirstTimerRegister.css";
 import { API_URL } from "../App";
 
@@ -15,36 +14,63 @@ const initialState = {
   roomNumber: "",
   joinChurch: "",
   joinBasonta: "",
+  basontaChoice: "",
   knownPerson: "",
 };
+
+const BASONTA_OPTIONS = [
+  { label: "Choir", emoji: "🎵" },
+  { label: "Film Stars", emoji: "🎬" },
+  { label: "Dancing Stars", emoji: "💃" },
+  { label: "Light Bearers", emoji: "🎤" },
+  { label: "Christian Pop Stars", emoji: "🎶" },
+  { label: "Ushers / Flowers", emoji: "🌸" },
+  { label: "Media", emoji: "📸" },
+  { label: "Other", emoji: "✨" },
+];
 
 export default function FirstTimerRegister() {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
     if (!form.fullName || !form.phoneNumber) {
       alert("Please fill in your name and phone number.");
       return;
     }
 
-    // Read the ref (createdBy) from the URL
     const params = new URLSearchParams(window.location.search);
-    const createdBy = params.get("ref") || null;
+    const ref = params.get("ref");
+    const token = localStorage.getItem("token");
+
+    // If logged in user is creating → use authenticated endpoint
+    // If QR code scan → use public endpoint with ref param
+    const isAuthenticated = !!token && !ref;
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/first-timers/public`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, createdBy }),
-      });
+      const res = await fetch(
+        isAuthenticated
+          ? `${API_URL}/api/first-timers`
+          : `${API_URL}/api/first-timers/public`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(isAuthenticated && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify(
+            isAuthenticated
+              ? form  // backend reads createdBy from token
+              : { ...form, createdBy: ref }  // public path uses ref
+          ),
+        }
+      );
       if (res.ok) {
         setSubmitted(true);
       } else {
@@ -70,20 +96,22 @@ export default function FirstTimerRegister() {
   }
 
   return (
-    <div className="register-page">
-
-      {/* Back button — outside the card, pinned to top-left */}
-      <button className="back-btn" onClick={() => navigate(-1)}>
-        &#8592;
-      </button>
-
-      {/* Header card — no back button inside */}
+    <>
+      {/* Header card */}
       <div className="register-header-card">
-        <h2 className="register-header-title">Welcome!</h2>
+        <h2 className="register-header-title">FIRST - TIMERS FORM</h2>
+        <h3 className="register-header-church">Welcome to RSC - Fountain of Life Cathedral Bomso Town Church🤍 </h3>
+        
         <p className="register-subtitle">
-          We're glad you're here. Fill in your details below.
-        </p>
-      </div>
+          We are delighted to have you worship with us! This form helps us collect
+    relevant details so our pastors and leadership can check up on you,
+    support your spiritual growth, and stay connected with you from time to time.
+  </p>
+  <p className="register-subtitle register-note">
+    Kindly fill in all the sections that apply to you.{" "}
+    <em>Your information will be treated with care and used solely for follow-up and pastoral support.</em>
+  </p>
+</div>
 
       <div className="register-content">
         <p className="section-label">Personal info</p>
@@ -197,20 +225,44 @@ export default function FirstTimerRegister() {
               ))}
             </div>
           </div>
+          
           <div className="field-group">
-            <label>Would you like to join a basonta?</label>
-            <div className="choice-row">
-              {["Yes", "No", "Maybe"].map((opt) => (
-                <button
-                  key={opt}
-                  className={`choice-btn ${form.joinBasonta === opt ? "selected" : ""}`}
-                  onClick={() => handleChange("joinBasonta", opt)}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
+  <label>Would you like to join a basonta?</label>
+  <div className="choice-row">
+    {["Yes", "No", "Maybe"].map((opt) => (
+      <button
+        key={opt}
+        className={`choice-btn ${form.joinBasonta === opt ? "selected" : ""}`}
+        onClick={() => {
+          handleChange("joinBasonta", opt);
+          if (opt !== "Yes") handleChange("basontaChoice", "");
+        }}
+      >
+        {opt}
+      </button>
+    ))}
+  </div>
+</div>
+
+{/* Basonta picker — only shows when Yes is selected */}
+{form.joinBasonta === "Yes" && (
+  <div className="field-group">
+    <label>Which basonta would you like to join?</label>
+    <div className="basonta-grid">
+      {BASONTA_OPTIONS.map((opt) => (
+        <button
+          key={opt.label}
+          className={`basonta-tile ${form.basontaChoice === opt.label ? "selected" : ""}`}
+          onClick={() => handleChange("basontaChoice", opt.label)}
+        >
+          <span className="basonta-emoji">{opt.emoji}</span>
+          <span className="basonta-label">{opt.label}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+)}
+
           <div className="field-group">
             <label>Who do you know in the church?</label>
             <input
@@ -230,6 +282,6 @@ export default function FirstTimerRegister() {
           {loading ? "Submitting..." : "Submit"}
         </button>
       </div>
-    </div>
+    </>
   );
 }

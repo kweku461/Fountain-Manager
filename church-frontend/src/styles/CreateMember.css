@@ -56,21 +56,61 @@
   gap: 22px;
 }
 
-.create-member-form input {
+.create-member-form input,
+.create-member-form .date-input {
   height: 56px;
   padding: 0 20px;
   border-radius: 14px;
   border: none;
   font-size: 14px;
-
   background: #ffffff;
-
-  box-shadow:
-    0px 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.create-member-form input:focus {
+.create-member-form input:focus,
+.create-member-form .date-input:focus {
   outline: none;
+}
+
+/* BASONTA SELECT */
+.basonta-select {
+  height: 56px;
+  padding: 0 20px;
+  border-radius: 14px;
+  border: none;
+  font-size: 14px;
+  background: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
+  appearance: none;
+  color: #111;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.basonta-select:focus {
+  outline: none;
+}
+
+.basonta-select option[value=""] {
+  color: #9aa0a6;
+}
+
+/* DATE INPUT PLACEHOLDER COLOR */
+.date-input::-webkit-datetime-edit-text,
+.date-input::-webkit-datetime-edit-month-field,
+.date-input::-webkit-datetime-edit-day-field,
+.date-input::-webkit-datetime-edit-year-field {
+  color: #9aa0a6;
+}
+
+.date-input:not([value=""])::-webkit-datetime-edit-text,
+.date-input:not([value=""])::-webkit-datetime-edit-month-field,
+.date-input:not([value=""])::-webkit-datetime-edit-day-field,
+.date-input:not([value=""])::-webkit-datetime-edit-year-field {
+  color: #111;
 }
 
 /* ACTIONS */
@@ -86,13 +126,10 @@
   height: 56px;
   border-radius: 14px;
   border: none;
-
   background: #ffffff;
   font-size: 16px;
   cursor: pointer;
-
-  box-shadow:
-    0px 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .done-btn {
@@ -105,7 +142,5 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-
-  box-shadow:
-    0px 6px 14px rgba(79, 70, 229, 0.4);
+  box-shadow: 0px 6px 14px rgba(79, 70, 229, 0.4);
 }

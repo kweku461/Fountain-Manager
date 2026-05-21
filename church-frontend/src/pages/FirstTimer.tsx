@@ -31,6 +31,7 @@ interface FirstTimer {
   roomNumber: string;
   joinChurch: string;
   joinBasonta: string;
+  basontaChoice: string;
   knownPerson: string;
   visitDate: string;
 }
@@ -340,6 +341,7 @@ const REGISTER_URL = `${window.location.origin}/first-timers/register?ref=${enco
                 { label: "Room", value: selectedPerson.roomNumber },
                 { label: "Join church?", value: selectedPerson.joinChurch },
                 { label: "Join basonta?", value: selectedPerson.joinBasonta },
+                { label: "Basonta choice", value: selectedPerson.basontaChoice },
                 { label: "Knows in church", value: selectedPerson.knownPerson },
                 { label: "Visit date", value: selectedPerson.visitDate },
               ]

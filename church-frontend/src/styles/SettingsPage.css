@@ -498,3 +498,101 @@
   background: #fef2f2;
   color: #e53935;
 }
+
+/* ── Export Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 50;
+}
+
+.export-modal {
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 40px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.export-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: #f0f3fa;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-modal-sub {
+  font-size: 13px;
+  color: #7a7a7a;
+  margin: 0;
+}
+
+.export-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.export-modal-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.export-modal-field input,
+.export-modal-field select {
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  padding: 0 14px;
+  font-size: 14px;
+  background: #f8f9fc;
+  outline: none;
+}
+
+.export-modal-field input:focus,
+.export-modal-field select:focus {
+  border-color: #4f46e5;
+}
+
+.export-modal-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 14px;
+  background: #4f46e5;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.export-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

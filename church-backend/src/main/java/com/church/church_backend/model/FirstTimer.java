@@ -49,7 +49,9 @@ public class FirstTimer {
     private LocalDateTime createdAt;
 
     @Column(name = "created_by")
-private String createdBy; // stores the email of the logged-in user
+    private String createdBy; // stores the email of the logged-in user
+    @Column(name = "basonta_choice")
+    private String basontaChoice;
 
     @PrePersist
     protected void onCreate() {
@@ -88,4 +90,6 @@ private String createdBy; // stores the email of the logged-in user
     public LocalDateTime getCreatedAt() { return createdAt; }
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+    public String getBasontaChoice() { return basontaChoice; }
+    public void setBasontaChoice(String basontaChoice) { this.basontaChoice = basontaChoice; }
 }
