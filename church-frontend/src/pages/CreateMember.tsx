@@ -130,29 +130,29 @@ export default function CreateMember() {
         />
 
         {/* BIRTHDATE */}
-        <input
-  type="text"
-  placeholder="Birth date...."
-  value={birthdate}
-  onChange={(e) => setBirthdate(e.target.value)}
-  onFocus={(e) => (e.target.type = "date")}
-  onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
-  disabled={loading}
-  className="date-input"
-/>
+        <div className="date-input-wrapper">
+          <label className="date-input-label">Birth date</label>
+          <input
+            type="date"
+            value={birthdate}
+            onChange={(e) => setBirthdate(e.target.value)}
+            disabled={loading}
+            className="date-input"
+          />
+        </div>
 
         {/* BASONTA */}
         <select
-  value={basonta}
-  onChange={(e) => setBasonta(e.target.value)}
-  disabled={loading}
-  className="basonta-select"
->
-  <option value="">Select Basonta....</option>
-  {BASONTA_OPTIONS.map((opt) => (
-    <option key={opt} value={opt}>{opt}</option>
-  ))}
-</select>
+          value={basonta}
+          onChange={(e) => setBasonta(e.target.value)}
+          disabled={loading}
+          className="basonta-select"
+        >
+          <option value="">Select Basonta....</option>
+          {BASONTA_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
       </div>
 
       {/* ACTION BUTTONS */}

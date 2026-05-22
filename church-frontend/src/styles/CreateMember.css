@@ -56,8 +56,7 @@
   gap: 22px;
 }
 
-.create-member-form input,
-.create-member-form .date-input {
+.create-member-form input {
   height: 56px;
   padding: 0 20px;
   border-radius: 14px;
@@ -69,8 +68,40 @@
   box-sizing: border-box;
 }
 
-.create-member-form input:focus,
-.create-member-form .date-input:focus {
+.create-member-form input:focus {
+  outline: none;
+}
+
+/* DATE INPUT WRAPPER */
+.date-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.date-input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9aa0a6;
+  padding-left: 4px;
+}
+
+.date-input {
+  height: 56px;
+  padding: 0 20px;
+  border-radius: 14px;
+  border: none;
+  font-size: 14px;
+  background: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  box-sizing: border-box;
+  color: #111;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.date-input:focus {
   outline: none;
 }
 
@@ -96,21 +127,6 @@
 
 .basonta-select option[value=""] {
   color: #9aa0a6;
-}
-
-/* DATE INPUT PLACEHOLDER COLOR */
-.date-input::-webkit-datetime-edit-text,
-.date-input::-webkit-datetime-edit-month-field,
-.date-input::-webkit-datetime-edit-day-field,
-.date-input::-webkit-datetime-edit-year-field {
-  color: #9aa0a6;
-}
-
-.date-input:not([value=""])::-webkit-datetime-edit-text,
-.date-input:not([value=""])::-webkit-datetime-edit-month-field,
-.date-input:not([value=""])::-webkit-datetime-edit-day-field,
-.date-input:not([value=""])::-webkit-datetime-edit-year-field {
-  color: #111;
 }
 
 /* ACTIONS */
