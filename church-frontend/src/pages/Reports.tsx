@@ -467,7 +467,7 @@ const fetchChurchName = async () => {
         <div className="nav-item active">
           <FileText size={22} /><span>Reports</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/calendar")}>
           <Calendar size={22} /><span>Calendar</span>
         </div>
         <div className="nav-item" onClick={() => navigate("/settings")}>

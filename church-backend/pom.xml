@@ -99,6 +99,17 @@
     <scope>runtime</scope>
 </dependency>
 
+    <!-- Push notification support -->
+	<dependency>
+    <groupId>nl.martijndwars</groupId>
+    <artifactId>web-push</artifactId>
+    <version>5.1.1</version>
+</dependency>
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcprov-jdk15on</artifactId>
+    <version>1.70</version>
+</dependency>
 	</dependencies>
 
 	<build>

@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   X,
+  Calendar,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/SideDrawer.css";
@@ -23,6 +24,7 @@ const mainNavItems = [
   { label: "Attendance", icon: CheckCircle, path: "/attendance" },
   { label: "Services", icon: Church, path: "/services" },
   { label: "First Timers", icon: Heart, path: "/first-timers" },
+  { label: "Calendar", icon: Calendar, path: "/calendar" },
 ];
 
 const toolNavItems = [

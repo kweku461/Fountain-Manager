@@ -94,6 +94,11 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/church").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/church").authenticated()
 
+                    // Push notifications
+                    .requestMatchers(HttpMethod.GET, "/api/push/vapid-public-key").authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/push/subscribe").authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/push/unsubscribe").authenticated()
+
                     // Everything else requires authentication
                     .anyRequest().authenticated()
             )

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  Home, Calendar, Settings, User,
+  Home, Calendar, Settings,
   Search, ChevronLeft, MoreHorizontal, CheckCircle,
 } from "lucide-react";
 import { API_URL } from "../App";
@@ -353,17 +353,17 @@ export default function AttendanceMark() {
 
       {/* BOTTOM NAV */}
       <div className="bottom-nav">
-        <div className="nav-item active">
+        <div className="nav-item" onClick={() => navigate("/dashboard")}>
           <Home size={22} /><span>Home</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item active">
+          <CheckCircle size={22} /><span>Attendance</span>
+        </div>
+        <div className="nav-item" onClick={() => navigate("/calendar")}>
           <Calendar size={22} /><span>Calendar</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/settings")}>
           <Settings size={22} /><span>Settings</span>
-        </div>
-        <div className="nav-item">
-          <User size={22} /><span>Profile</span>
         </div>
       </div>
     </div>

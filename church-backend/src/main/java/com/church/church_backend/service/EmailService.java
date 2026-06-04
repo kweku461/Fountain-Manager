@@ -1,5 +1,6 @@
 package com.church.church_backend.service;
 
+import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
@@ -7,6 +8,7 @@ import com.mailjet.client.resource.Emailv31;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +23,12 @@ public class EmailService {
             @Value("${mailjet.api.key}")    String apiKey,
             @Value("${mailjet.api.secret}") String apiSecret
     ) {
-        this.mailjetClient = new MailjetClient(apiKey, apiSecret);
+        this.mailjetClient = new MailjetClient(
+            ClientOptions.builder()
+                .apiKey(apiKey)
+                .apiSecretKey(apiSecret)
+                .build()
+        );
     }
 
     // ── Shared send helper ──
@@ -48,16 +55,15 @@ public class EmailService {
             } else {
                 System.err.println("⚠️ Mailjet responded with status " + response.getStatus()
                         + " | Body: " + response.getData());
-                throw new RuntimeException("Failed to send email. Mailjet status: " + response.getStatus());
             }
 
         } catch (Exception e) {
             System.err.println("⚠️ Failed to send email to " + to + ": " + e.getMessage());
-            throw new RuntimeException("Failed to send email: " + e.getMessage());
         }
     }
 
     // ── OTP verification email ──
+    @Async
     public void sendOtp(String to, String otp) {
         sendEmail(
             to,
@@ -68,6 +74,7 @@ public class EmailService {
     }
 
     // ── First timer alert ──
+    @Async
     public void sendFirstTimerAlert(String adminEmail, String fullName, String phoneNumber) {
         sendEmail(
             adminEmail,

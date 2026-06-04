@@ -788,13 +788,13 @@ export default function SettingsPage() {
         <div className="nav-item" onClick={() => navigate("/dashboard")}>
           <Home size={22} /><span>Home</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/calendar")}>
           <Calendar size={22} /><span>Calendar</span>
         </div>
         <div className="nav-item active">
           <Settings size={22} /><span>Settings</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/settings", { state: { openProfile: true } })}>
           <User size={22} /><span>Profile</span>
         </div>
       </div>

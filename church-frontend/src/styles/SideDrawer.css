@@ -169,6 +169,8 @@
 .side-drawer__nav-icon--first-timers { background: rgba(237, 100, 166, 0.15); color: #f687b3; }
 .side-drawer__nav-icon--reports      { background: rgba(237, 137, 54, 0.15);  color: #f6ad55; }
 .side-drawer__nav-icon--settings     { background: rgba(56, 178, 172, 0.15);  color: #4fd1c5; }
+.side-drawer__nav-icon--calendar     { background: rgba(251, 191, 36, 0.15); color: #e2fb24; }
+
 
 /* FOOTER */
 .side-drawer__footer {

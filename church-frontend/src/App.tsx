@@ -16,6 +16,7 @@ import Reports from "./pages/Reports";
 import SettingsPage from "./pages/SettingsPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import CalendarPage from "./pages/CalendarPage";
 
 
 
@@ -53,6 +54,9 @@ export default function App() {
 
         {/* First timers admin - protected */}
         <Route path="/first-timers" element={<ProtectedRoute><FirstTimers /></ProtectedRoute>} />
+        
+        {/* Calendar */}
+        <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/login" replace />} />

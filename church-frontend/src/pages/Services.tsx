@@ -8,6 +8,7 @@ import {
   Settings,
   User,
   X,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -26,6 +27,8 @@ interface Service {
   livestreamAvailable: boolean;
 }
 
+type SortOption = "newest" | "oldest";
+
 export default function Services() {
   const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
@@ -37,6 +40,8 @@ export default function Services() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState<string>("");
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -48,10 +53,7 @@ export default function Services() {
       try {
         setLoading(true);
         const response = await apiCall<Service[]>("/services");
-        if (!response.ok) {
-          setError("Failed to load services");
-          return;
-        }
+        if (!response.ok) { setError("Failed to load services"); return; }
         setServices(response.data || []);
       } catch {
         setError("An error occurred while loading services");
@@ -62,18 +64,28 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  const filteredServices = services.filter(
-    (service) =>
-      service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const getFilteredAndSorted = () => {
+    let result = services.filter(
+      (s) =>
+        s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    result = [...result].sort((a, b) => {
+      const dateA = new Date(a.startTime).getTime();
+      const dateB = new Date(b.startTime).getTime();
+      return sortBy === "newest" ? dateB - dateA : dateA - dateB;
+    });
+
+    return result;
+  };
+
+  const filteredServices = getFilteredAndSorted();
 
   const groupedServices = filteredServices.reduce(
     (groups: { [key: string]: Service[] }, service) => {
       const date = new Date(service.startTime).toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
+        weekday: "short", month: "short", day: "numeric",
       });
       if (!groups[date]) groups[date] = [];
       groups[date].push(service);
@@ -93,9 +105,7 @@ export default function Services() {
     try {
       await fetch(`${API_URL}/services/delete/${deleteConfirmId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setServices((prev) => prev.filter((s) => s.id !== deleteConfirmId));
       setDeleteConfirmId(null);
@@ -107,24 +117,18 @@ export default function Services() {
 
   const formatTime = (dateStr: string) => {
     if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return new Date(dateStr).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   };
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "—";
     return new Date(dateStr).toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+      weekday: "short", day: "numeric", month: "short", year: "numeric",
     });
   };
 
   return (
-    <div className="services-page" onClick={() => setOpenMenuId(null)}>
+    <div className="services-page" onClick={() => { setOpenMenuId(null); setShowFilterMenu(false); }}>
 
       {/* HEADER CARD */}
       <div className="services-header-card">
@@ -135,8 +139,41 @@ export default function Services() {
             </div>
             <h2>Services</h2>
           </div>
-          <div className="icon-circle">
-            <MoreHorizontal size={20} />
+
+          {/* FILTER BUTTON */}
+          <div className="filter-btn-wrap" onClick={(e) => e.stopPropagation()}>
+            <button
+              className={`icon-circle filter-btn ${sortBy !== "newest" ? "filter-btn--active" : ""}`}
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+            >
+              <SlidersHorizontal size={18} color={sortBy !== "newest" ? "#ffffff" : undefined} />
+            </button>
+
+            {showFilterMenu && (
+              <div className="filter-dropdown" onClick={(e) => e.stopPropagation()}>
+                <div className="filter-dropdown-header">
+                  <p className="filter-dropdown-title">Sort Services</p>
+                  <button className="filter-reset-btn" onClick={() => setSortBy("newest")}>
+                    Reset
+                  </button>
+                </div>
+                <p className="filter-section-label">Sort by date</p>
+                <div className="filter-options">
+                  {[
+                    { value: "newest", label: "Newest first" },
+                    { value: "oldest", label: "Oldest first" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      className={`filter-option-btn ${sortBy === opt.value ? "selected" : ""}`}
+                      onClick={() => { setSortBy(opt.value as SortOption); setShowFilterMenu(false); }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -164,56 +201,33 @@ export default function Services() {
           Object.entries(groupedServices).map(([date, dateServices]) => (
             <div key={date}>
               <p className="date-label">{date}</p>
-
               {dateServices.map((service) => (
                 <div key={service.id} className="service-card">
                   <div className="service-card-inner">
-                    {/* SERVICE INFO */}
                     <div className="service-info">
                       <h4>{service.title}</h4>
                       <p>{service.description}</p>
                       <p>Preacher: {service.preacher}</p>
-                      {service.startTime && (
-                        <p>Time: {formatTime(service.startTime)}</p>
-                      )}
+                      {service.startTime && <p>Time: {formatTime(service.startTime)}</p>}
                     </div>
 
-                    {/* THREE DOTS MENU */}
-                    <div
-                      className="service-menu-wrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                    <div className="service-menu-wrap" onClick={(e) => e.stopPropagation()}>
                       <button
                         className="service-menu-btn"
-                        onClick={() =>
-                          setOpenMenuId(openMenuId === service.id ? null : service.id)
-                        }
+                        onClick={() => setOpenMenuId(openMenuId === service.id ? null : service.id)}
                       >
                         <MoreHorizontal size={18} />
                       </button>
 
                       {openMenuId === service.id && (
                         <div className="service-dropdown">
-                          <button
-                            onClick={() => {
-                              setSelectedService(service);
-                              setOpenMenuId(null);
-                            }}
-                          >
+                          <button onClick={() => { setSelectedService(service); setOpenMenuId(null); }}>
                             View details
                           </button>
-                          <button
-                            onClick={() => {
-                              navigate("/services/create", { state: { service } });
-                              setOpenMenuId(null);
-                            }}
-                          >
+                          <button onClick={() => { navigate("/services/create", { state: { service } }); setOpenMenuId(null); }}>
                             Edit
                           </button>
-                          <button
-                            className="danger"
-                            onClick={() => confirmDelete(service.id, service.title)}
-                          >
+                          <button className="danger" onClick={() => confirmDelete(service.id, service.title)}>
                             Delete
                           </button>
                         </div>
@@ -236,16 +250,14 @@ export default function Services() {
         <div className="nav-item" onClick={() => navigate("/dashboard")}>
           <Home size={22} /><span>Home</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => navigate("/calendar")}>
           <Calendar size={22} /><span>Calendar</span>
         </div>
         <div className="nav-item active">
           <Settings size={22} /><span>Services</span>
         </div>
-        {/* Profile — opens Settings with profile section expanded */}
-        <div className="nav-item clickable" onClick={() => navigate("/settings", { state: { openProfile: true } })}>
-          <User size={22} />
-          <span>Profile</span>
+        <div className="nav-item" onClick={() => navigate("/settings", { state: { openProfile: true } })}>
+          <User size={22} /><span>Profile</span>
         </div>
       </div>
 
@@ -259,7 +271,6 @@ export default function Services() {
                 <X size={20} />
               </button>
             </div>
-
             <div className="detail-rows">
               {[
                 { label: "Service name", value: selectedService.title },
@@ -268,22 +279,16 @@ export default function Services() {
                 { label: "Date", value: formatDate(selectedService.startTime) },
                 { label: "Time", value: formatTime(selectedService.startTime) },
                 { label: "Location", value: selectedService.location },
-              ]
-                .filter((row) => row.value)
-                .map((row) => (
-                  <div className="detail-row" key={row.label}>
-                    <span className="detail-label">{row.label}</span>
-                    <span className="detail-value">{row.value}</span>
-                  </div>
-                ))}
+              ].filter((row) => row.value).map((row) => (
+                <div className="detail-row" key={row.label}>
+                  <span className="detail-label">{row.label}</span>
+                  <span className="detail-value">{row.value}</span>
+                </div>
+              ))}
             </div>
-
             <button
               className="modal-edit-btn"
-              onClick={() => {
-                navigate("/services/create", { state: { service: selectedService } });
-                setSelectedService(null);
-              }}
+              onClick={() => { navigate("/services/create", { state: { service: selectedService } }); setSelectedService(null); }}
             >
               Edit Service
             </button>
@@ -296,27 +301,18 @@ export default function Services() {
         <div className="modal-overlay" onClick={() => setDeleteConfirmId(null)}>
           <div className="confirm-popup" onClick={(e) => e.stopPropagation()}>
             <p className="confirm-message">
-              Are you sure you want to delete{" "}
-              <strong>{deleteConfirmName}</strong>? This action cannot be undone.
+              Are you sure you want to delete <strong>{deleteConfirmName}</strong>? This action cannot be undone.
             </p>
             <div className="confirm-actions">
-              <button className="confirm-cancel-btn" onClick={() => setDeleteConfirmId(null)}>
-                Cancel
-              </button>
-              <button className="confirm-delete-btn" onClick={handleDelete}>
-                Delete
-              </button>
+              <button className="confirm-cancel-btn" onClick={() => setDeleteConfirmId(null)}>Cancel</button>
+              <button className="confirm-delete-btn" onClick={handleDelete}>Delete</button>
             </div>
           </div>
         </div>
       )}
 
       {/* TOAST */}
-      {toast && (
-        <div className={`toast ${toast.type}`}>
-          {toast.message}
-        </div>
-      )}
+      {toast && <div className={`toast ${toast.type}`}>{toast.message}</div>}
     </div>
   );
 }
