@@ -56,7 +56,7 @@ export default function Members() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [editMember, setEditMember] = useState<Member | null>(null);
-  const [editLoading, setEditLoading] = useState(false);
+  const [_editLoading, setEditLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState<string>("");
@@ -154,7 +154,7 @@ export default function Members() {
     }
   };
 
-  const handleEditSave = async () => {
+  const _handleEditSave = async () => {
     if (!editMember) return;
     if (!editMember.firstName || !editMember.lastName) {
       alert("First and last name are required."); return;
