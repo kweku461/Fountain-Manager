@@ -94,8 +94,6 @@ export default function CalendarPage() {
   // Get upcoming birthdays (next 30 days)
   const getUpcomingBirthdays = (): { name: string; date: string; daysUntil: number }[] => {
     const upcoming: { name: string; date: string; daysUntil: number }[] = [];
-    const _todayMonth = today.getMonth();
-    const _todayDay = today.getDate();
 
     members.forEach((m) => {
       if (!m.birthdate) return;

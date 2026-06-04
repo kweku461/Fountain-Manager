@@ -55,8 +55,6 @@ export default function Members() {
   const [loading, setLoading] = useState(true);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [editMember, setEditMember] = useState<Member | null>(null);
-  const [_editLoading, setEditLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState<string>("");
@@ -151,27 +149,6 @@ export default function Members() {
       showToast("Member deleted successfully", "success");
     } catch {
       showToast("An error occurred while deleting the member", "error");
-    }
-  };
-
-  const _handleEditSave = async () => {
-    if (!editMember) return;
-    if (!editMember.firstName || !editMember.lastName) {
-      alert("First and last name are required."); return;
-    }
-    setEditLoading(true);
-    try {
-      const response = await apiCall<Member>(`/api/members/${editMember.id}`, {
-        method: "PUT",
-        body: JSON.stringify(editMember),
-      });
-      if (!response.ok) { alert("Failed to update member."); return; }
-      setMembers((prev) => prev.map((m) => (m.id === editMember.id ? response.data! : m)));
-      setEditMember(null);
-    } catch {
-      alert("An error occurred while updating the member.");
-    } finally {
-      setEditLoading(false);
     }
   };
 
