@@ -36,7 +36,7 @@ public class SecurityConfig {
             "http://localhost:5175",
             "http://localhost:8080",
             // Production frontend on Render
-            "https://fountain-manager-church-frontend.onrender.com"
+            "https://fountain-manager-church-frontend-wep1.onrender.com"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
